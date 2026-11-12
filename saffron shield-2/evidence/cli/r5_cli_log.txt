@@ -1,0 +1,278 @@
+# Databricks Job Execution Using CLI
+
+## Objective
+To execute an existing Databricks Job using Databricks CLI, capture its execution details in JSON format, and store the execution report in a Unity Catalog Volume.
+
+## Step 1: Configure Databricks CLI
+
+Configure the Databricks CLI with the workspace URL and a dedicated profile.
+
+```powershell
+databricks configure --host https://dbc-2bd5e4bd-405a.cloud.databricks.com --profile r5_cli
+```
+
+Authentication is completed using the requested credentials.
+
+## Step 2: Verify Workspace Access
+
+List the available catalogs to verify that CLI authentication and workspace connectivity are working.
+
+```powershell
+databricks catalogs list --profile r5_cli
+```
+
+## Step 3: Execute the Existing Databricks Job
+
+Trigger the existing Job using its Job ID and capture the execution response in JSON format.
+
+Job Name: `claims_daily`
+
+Job ID: `1021538314083895`
+
+```powershell
+databricks jobs run-now 1021538314083895 --profile r5_cli --output JSON | Out-File "$env:USERPROFILE\r5_cli_temp.json" -Encoding utf8
+```
+
+This command triggers the Job and stores its execution response locally in JSON format.
+
+## Step 4: Upload Execution Report to Unity Catalog Volume
+ 
+Copy the generated JSON report into the designated Unity Catalog Volume location.
+
+```powershell
+databricks fs cp "$env:USERPROFILE\r5_cli_temp.json" dbfs:/Volumes/claims/raw/landing/cli_check/cli_check.txt --profile r5_cli
+```
+
+## Step 5: Verify Job Execution
+
+The execution JSON contains:
+- Job ID and Run ID
+- Job execution start and end timestamps
+- Overall execution status
+- Individual task execution statuses
+- Task dependencies and execution details
+- Run page URLs
+
+## Output Location
+
+Unity Catalog Volume:
+
+`/Volumes/claims/raw/landing/cli_check/cli_check.txt`
+
+The JSON execution report is stored in the Volume for future reference and verification.
+
+
+﻿{
+  "cleanup_duration": 0,
+  "creator_user_name": "adikamodiya@gmail.com",
+  "effective_performance_target": "PERFORMANCE_OPTIMIZED",
+  "end_time": 1794459949738,
+  "execution_duration": 0,
+  "job_id": 1021538314083895,
+  "job_run_id": 569029165598329,
+  "number_in_job": 569029165598329,
+  "original_attempt_run_id": 569029165598329,
+  "run_duration": 137586,
+  "run_id": 569029165598329,
+  "run_name": "claims_daily",
+  "run_page_url": "https://dbc-2bd5e4bd-405a.cloud.databricks.com/?o=7474659560736194#job/1021538314083895/run/569029165598329",
+  "run_type": "JOB_RUN",
+  "setup_duration": 0,
+  "start_time": 1794459812152,
+  "state": {
+    "life_cycle_state": "TERMINATED",
+    "result_state": "SUCCESS",
+    "state_message": "",
+    "user_cancelled_or_timedout": false
+  },
+  "status": {
+    "state": "TERMINATED",
+    "termination_details": {
+      "code": "SUCCESS",
+      "message": "",
+      "type": "SUCCESS"
+    }
+  },
+  "tasks": [
+    {
+      "attempt_number": 0,
+      "cleanup_duration": 0,
+      "condition_task": {
+        "left": "{{tasks.dq_check.values.dq_problems}}",
+        "op": "EQUAL_TO",
+        "outcome": "false",
+        "right": "0"
+      },
+      "depends_on": [
+        {
+          "task_key": "dq_check"
+        }
+      ],
+      "end_time": 1794459949392,
+      "execution_duration": 0,
+      "run_id": 270389322492206,
+      "run_if": "ALL_SUCCESS",
+      "run_page_url": "https://dbc-2bd5e4bd-405a.cloud.databricks.com/?o=7474659560736194#job/1021538314083895/run/270389322492206",
+      "setup_duration": 0,
+      "start_time": 1794459948374,
+      "state": {
+        "life_cycle_state": "TERMINATED",
+        "result_state": "SUCCESS",
+        "state_message": "",
+        "user_cancelled_or_timedout": false
+      },
+      "status": {
+        "state": "TERMINATED",
+        "termination_details": {
+          "code": "SUCCESS",
+          "message": "",
+          "type": "SUCCESS"
+        }
+      },
+      "task_key": "dq_gate"
+    },
+    {
+      "attempt_number": 0,
+      "cleanup_duration": 0,
+      "depends_on": [
+        {
+          "task_key": "ingest"
+        }
+      ],
+      "effective_performance_target": "PERFORMANCE_OPTIMIZED",
+      "end_time": 1794459918950,
+      "execution_duration": 81000,
+      "pipeline_task": {
+        "pipeline_id": "5ddb66c6-98d4-48ef-b11f-9a9b0bb4d1ea"
+      },
+      "run_id": 796248030233226,
+      "run_if": "ALL_SUCCESS",
+      "run_page_url": "https://dbc-2bd5e4bd-405a.cloud.databricks.com/?o=7474659560736194#job/1021538314083895/run/796248030233226",
+      "setup_duration": 0,
+      "start_time": 1794459837154,
+      "state": {
+        "life_cycle_state": "TERMINATED",
+        "result_state": "SUCCESS",
+        "state_message": "",
+        "user_cancelled_or_timedout": false
+      },
+      "status": {
+        "state": "TERMINATED",
+        "termination_details": {
+          "code": "SUCCESS",
+          "message": "",
+          "type": "SUCCESS"
+        }
+      },
+      "task_key": "pipeline"
+    },
+    {
+      "attempt_number": 0,
+      "cleanup_duration": 0,
+      "depends_on": [
+        {
+          "task_key": "pipeline"
+        }
+      ],
+      "effective_performance_target": "PERFORMANCE_OPTIMIZED",
+      "end_time": 1794459948005,
+      "execution_duration": 25000,
+      "notebook_task": {
+        "base_parameters": {
+          "expected_new_rows": "120"
+        },
+        "notebook_path": "/Users/adikamodiya@gmail.com/Projects/saffron-shield/dq_check",
+        "source": "WORKSPACE"
+      },
+      "run_id": 107086530178986,
+      "run_if": "ALL_SUCCESS",
+      "run_page_url": "https://dbc-2bd5e4bd-405a.cloud.databricks.com/?o=7474659560736194#job/1021538314083895/run/107086530178986",
+      "setup_duration": 3000,
+      "start_time": 1794459919152,
+      "state": {
+        "life_cycle_state": "TERMINATED",
+        "result_state": "SUCCESS",
+        "state_message": "",
+        "user_cancelled_or_timedout": false
+      },
+      "status": {
+        "state": "TERMINATED",
+        "termination_details": {
+          "code": "SUCCESS",
+          "message": "",
+          "type": "SUCCESS"
+        }
+      },
+      "task_key": "dq_check"
+    },
+    {
+      "attempt_number": 0,
+      "cleanup_duration": 0,
+      "depends_on": [
+        {
+          "outcome": "true",
+          "task_key": "dq_gate"
+        }
+      ],
+      "effective_performance_target": "PERFORMANCE_OPTIMIZED",
+      "end_time": 1794459949618,
+      "execution_duration": 0,
+      "notebook_task": {
+        "notebook_path": "/Users/adikamodiya@gmail.com/Projects/saffron-shield/publish_gold",
+        "source": "WORKSPACE"
+      },
+      "run_id": 202363684583494,
+      "run_if": "ALL_SUCCESS",
+      "run_page_url": "https://dbc-2bd5e4bd-405a.cloud.databricks.com/?o=7474659560736194#job/1021538314083895/run/202363684583494",
+      "setup_duration": 0,
+      "start_time": 1794459949618,
+      "state": {
+        "life_cycle_state": "SKIPPED",
+        "result_state": "EXCLUDED",
+        "state_message": "Excluded because its conditional dependency on dq_gate was not met.",
+        "user_cancelled_or_timedout": false
+      },
+      "status": {
+        "state": "TERMINATED",
+        "termination_details": {
+          "code": "SKIPPED",
+          "message": "Excluded because its conditional dependency on dq_gate was not met.",
+          "type": "SUCCESS"
+        }
+      },
+      "task_key": "publish_gold"
+    },
+    {
+      "attempt_number": 0,
+      "cleanup_duration": 0,
+      "effective_performance_target": "PERFORMANCE_OPTIMIZED",
+      "end_time": 1794459836805,
+      "execution_duration": 21000,
+      "notebook_task": {
+        "notebook_path": "/Users/adikamodiya@gmail.com/Projects/saffron-shield/ingest",
+        "source": "WORKSPACE"
+      },
+      "run_id": 455555931254412,
+      "run_if": "ALL_SUCCESS",
+      "run_page_url": "https://dbc-2bd5e4bd-405a.cloud.databricks.com/?o=7474659560736194#job/1021538314083895/run/455555931254412",
+      "setup_duration": 3000,
+      "start_time": 1794459812184,
+      "state": {
+        "life_cycle_state": "TERMINATED",
+        "result_state": "SUCCESS",
+        "state_message": "",
+        "user_cancelled_or_timedout": false
+      },
+      "status": {
+        "state": "TERMINATED",
+        "termination_details": {
+          "code": "SUCCESS",
+          "message": "",
+          "type": "SUCCESS"
+        }
+      },
+      "task_key": "ingest"
+    }
+  ],
+  "trigger": "ONE_TIME"
+}

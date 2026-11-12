@@ -1,4 +1,4 @@
-CREATE OR REFRESH STREAMING TABLE ${catalog_name}.bronze.plans
+CREATE OR REFRESH STREAMING TABLE ${target_catalog}.bronze.plans
 AS
 SELECT
     *,
@@ -6,7 +6,7 @@ SELECT
     current_timestamp() AS ingestion_ts
 FROM STREAM(
     read_files(
-        '/Volumes/${catalog_name}/raw/landing/plans/',
+        '/Volumes/${source_catalog}/raw/landing/plans/',
         format => 'csv',
         header => 'true',
         inferColumnTypes => false,
@@ -16,7 +16,7 @@ FROM STREAM(
 );
 
 
-CREATE OR REFRESH STREAMING TABLE ${catalog_name}.bronze.claims
+CREATE OR REFRESH STREAMING TABLE ${target_catalog}.bronze.claims
 AS
 SELECT
     *,
@@ -24,7 +24,7 @@ SELECT
     current_timestamp() AS ingestion_ts
 FROM STREAM(
     read_files(
-        '/Volumes/${catalog_name}/raw/landing/claims/',
+        '/Volumes/${source_catalog}/raw/landing/claims/',
         format => 'json',
         multiLine => 'true',
         inferColumnTypes => true,
@@ -36,7 +36,7 @@ FROM STREAM(
 
 
 
-CREATE OR REFRESH STREAMING TABLE ${catalog_name}.bronze.hospitals
+CREATE OR REFRESH STREAMING TABLE ${target_catalog}.bronze.hospitals
 AS
 SELECT
     *,
@@ -44,7 +44,7 @@ SELECT
     current_timestamp() AS ingestion_ts
 FROM STREAM(
     read_files(
-        '/Volumes/${catalog_name}/raw/landing/hospitals/',
+        '/Volumes/${source_catalog}/raw/landing/hospitals/',
         format => 'csv',
         header => 'true',
         inferColumnTypes => false,
@@ -55,7 +55,7 @@ FROM STREAM(
 
 
 
-CREATE OR REFRESH STREAMING TABLE ${catalog_name}.bronze.hospital_network_history
+CREATE OR REFRESH STREAMING TABLE ${target_catalog}.bronze.hospital_network_history
 AS
 SELECT
     *,
@@ -63,7 +63,7 @@ SELECT
     current_timestamp() AS ingestion_ts
 FROM STREAM(
     read_files(
-        '/Volumes/${catalog_name}/raw/landing/hospital_network_history/',
+        '/Volumes/${source_catalog}/raw/landing/hospital_network_history/',
         format => 'csv',
         header => 'true',
         inferColumnTypes => false,
@@ -74,7 +74,7 @@ FROM STREAM(
 
 
 
-CREATE OR REFRESH STREAMING TABLE ${catalog_name}.bronze.members
+CREATE OR REFRESH STREAMING TABLE ${target_catalog}.bronze.members
 AS
 SELECT
     *,
@@ -82,7 +82,7 @@ SELECT
     current_timestamp() AS ingestion_ts
 FROM STREAM(
     read_files(
-        '/Volumes/${catalog_name}/raw/landing/members/',
+        '/Volumes/${source_catalog}/raw/landing/members/',
         format => 'csv',
         header => 'true',
         inferColumnTypes => false,
@@ -94,7 +94,7 @@ FROM STREAM(
 
 
 
-CREATE OR REFRESH STREAMING TABLE ${catalog_name}.bronze.policy
+CREATE OR REFRESH STREAMING TABLE ${target_catalog}.bronze.policy
 AS
 SELECT
     *,
@@ -102,7 +102,7 @@ SELECT
     current_timestamp() AS ingestion_ts
 FROM STREAM(
     read_files(
-        '/Volumes/${catalog_name}/raw/landing/policy_changes_cdc/',
+        '/Volumes/${source_catalog}/raw/landing/policy_changes_cdc/',
         format => 'json',
         multiLine => 'true',
         inferColumnTypes => true,

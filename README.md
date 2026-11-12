@@ -2,8 +2,9 @@
 
 A Lakeflow Spark Declarative Pipeline (SDP) that ingests insurance claims data from raw landing files and produces a governed, quality-checked gold layer for analytics.
 
-- **Catalog / schema convention:** `claims` catalog; layers live in `claims.bronze`, `claims.silver`, `claims.gold`
-- **Pipeline root:** `transformations/` (`bronze.sql`, `silver.py`, `gold.sql`)
+- **Catalog / schema convention:** default `claims` catalog with `claims.bronze`, `claims.silver`, `claims.gold`; fully parameterized — the DAB bundle deploys the same code to `claims_dev` and `claims_prod` via the `target_catalog` variable (see the R6 section below)
+- **Pipeline root:** `saffron-shield-1/transformations/` (`bronze.sql`, `silver.py`; `gold.sql` kept as a design reference only — gold is built by the `publish_gold` notebook since R4)
+- **Bundle root:** `databricks.yml` + `resources/` (R6) at the repo root; the bundle packages the pipeline code, job chain, and notebooks as-is (no `src/` layout required)
 - **Landing volume:** `/Volumes/claims/raw/landing/` with subfolders `claims`, `plans`, `hospitals`, `members`, `hospital_network_history`, `policy_changes_cdc`
 - **Upstream setup:** the `setup` notebook creates the catalog, schemas, volume, and folder layout
 
@@ -33,15 +34,17 @@ All sources use `schemaEvolutionMode => 'addNewColumns'` and a `rescuedDataColum
 ```
 /Volumes/claims/raw/landing/*        (Auto Loader sources)
         │
-        ▼  bronze.sql
-claims.bronze.*   (raw streaming tables, one per source)
+        ▼  bronze.sql                (${target_catalog} / ${source_catalog} from pipeline conf)
+claims.bronze.*    (raw streaming tables, one per source)
         │
-        ▼  silver.py
-claims.silver.*   (cleaned dimensions, CDC dimensions, validated claims)
+        ▼  silver.py                 (conf target_catalog, default claims)
+claims.silver.*    (cleaned dimensions, CDC dimensions, validated claims)
         │
-        ▼  gold.sql
-claims.gold.*     (analytics-ready fact + aggregates)
+        ▼  publish_gold notebook     (batch job task, R4+)
+claims.gold.*      (analytics-ready fact + aggregates)
 ```
+
+The same code serves all three catalogs: `claims` (default / legacy hand-built job), `claims_dev` (bundle target `dev`), `claims_prod` (bundle target `prod`) — the catalog name is injected, never hard-coded.
 
 ## Datasets
 
@@ -81,13 +84,17 @@ claims.gold.*     (analytics-ready fact + aggregates)
 
 Mandatory-field NULLs fail a rule; state-dependent fields (approved amount, settled_ts) NULL-pass.
 
-### Gold (gold.sql) — requirements R5–R7
+### Gold (publish_gold notebook) — requirements R5–R7
+
+Since R4 the gold layer is **outside the SDP pipeline**: `gold.sql` remains as a design reference only, and the `publish_gold` notebook (a task in the `claims_daily` / bundle jobs) builds the gold tables as **batch tables** with `CREATE OR REPLACE` from the current silver, then re-attaches the R1 row filter for the main `claims` catalog.
 
 | Dataset | Type | Notes |
 | --- | --- | --- |
-| `claims.gold.claims_enriched` | materialized view, `CLUSTER BY (admission_month, hospital_id)` | one row per clean claim, enriched **as of the admission date** |
-| `claims.gold.hospital_monthly` | materialized view | monthly per-hospital aggregates |
-| `claims.gold.hospital_monthly_designer` | materialized view | independent implementation; rows must match `hospital_monthly` exactly (verified via `EXCEPT`) |
+| `claims.gold.claims_enriched` | batch table, `CLUSTER BY (admission_month, hospital_id)` | one row per clean claim, enriched **as of the admission date** |
+| `claims.gold.hospital_monthly` | batch table | monthly per-hospital aggregates |
+| `claims.gold.hospital_monthly_designer` | batch table (main `claims` catalog only) | independent implementation; verified equal to `hospital_monthly` via `EXCEPT` (not rebuilt by the bundle's dev/prod runs) |
+
+**State of the three environments (Nov 12, 2026):** `claims.gold` = 3,046 rows / 469 hospital-months (refreshed after the Q-B FY-window rule; it had gone stale because the R5 run skipped publish_gold at the dq gate); `claims_dev.gold` = identical, built by the bundle dev run; `claims_prod.gold` = built by the prod bundle run.
 
 **`claims_enriched` enrichment logic:**
 
@@ -99,6 +106,8 @@ Mandatory-field NULLs fail a rule; state-dependent fields (approved amount, sett
 - `length_of_stay` — same-day stay counts as 1 day (Q-E convention); NULL while still admitted
 - `turnaround_days` — settlement minus submission; NULL until settled
 - `room_rent_over_cap` — room rate exceeds the plan's daily cap
+
+Note: Q-B also enforces the FY2025-26 window — admission/discharge dates and submitted/settled timestamps must fall in `2025-07-01..2026-06-30` (typed bounds, end-of-day inclusive; `settled_ts` NULL-passes). This rule is what excluded 44 `batch_007` claims from the Nov 12 gold refresh.
 
 **Forbidden columns:** `payable`, `is_payable`, `payable_amount`, `eligible`, `is_eligible`, `waiting_period_ok`, `copay_pct`, `paid_waiting_months`, `initial_waiting_days` must **not** appear in `claims_enriched`. The gold fact layer is factual enrichment only — adjudication logic (eligibility, copay, waiting periods, payable amounts) belongs to a separate layer.
 
@@ -122,15 +131,53 @@ The pipeline's outputs are Delta tables, and several Delta features do the heavy
 
 **Time travel** — all tables are versioned; `DESCRIBE HISTORY` and version/time-snapshot reads work on every dataset for debugging or rewind (the pipeline's rewind points are built on Delta versioning).
 
+## R6 — Deployable project (Declarative Automation Bundle)
+
+The whole project ships as a DAB rooted at the repo root (no `src/` layout needed — only `databricks.yml` is mandatory, plus whatever files it references):
+
+```
+saffron-shield/                 <- bundle root
+|-- databricks.yml              <- name, variables, targets (dev/prod)
+|-- resources/
+|   |-- pipeline.yml            <- claims_pipeline_bundle (serverless SDP)
+|   `-- job.yml                 <- claims_daily_bundle (task chain)
+|-- saffron-shield-1/transformations/   <- bronze.sql + silver.py (pipeline libraries)
+|-- ingest, dq_check, publish_gold      <- job task notebooks (catalog-widget parameterized)
+`-- saffron shield-2/evidence/cli/r6_bundle_log.txt   <- evidence log (validate -> dev -> prod)
+```
+
+**Variables & targets** (`databricks.yml`):
+
+| Variable | dev | prod | Purpose |
+| --- | --- | --- | --- |
+| `target_catalog` | `claims_dev` | `claims_prod` | catalog the pipeline writes; the job's dq_check / publish_gold read it |
+| `source_catalog` | `claims` | `claims` | shared raw landing volume source |
+| `name_prefix` | (empty) | `prod_` | resource-name prefix (pipeline names must be unique workspace-wide) |
+
+**Parameter flow:** bundle variable `target_catalog` -> resolved at deploy time -> job task `base_parameters: catalog` -> notebook widget `catalog` (default `claims`, so the legacy hand-built job is unaffected). The pipeline gets the same values via its `configuration` block, read in `bronze.sql` (`${target_catalog}`, `${source_catalog}`) and `silver.py` (`spark.conf.get("target_catalog", "claims")`). These are task-level parameters — visible under Tasks -> dq_check / publish_gold -> Base parameters, not in the "Job parameters" panel.
+
+**Commands** (run from the bundle root):
+
+```bash
+databricks bundle validate -t dev                        # validity check (also -t prod)
+databricks bundle deploy -t dev                          # dev auto-approves
+databricks bundle run claims_daily_bundle -t dev
+databricks bundle deploy -t prod --auto-approve          # prod REQUIRES --auto-approve
+databricks bundle run claims_daily_bundle -t prod        # resource key, not display name
+```
+
+The bundle job mirrors the hand-built `claims_daily` chain — ingest -> pipeline -> dq_check (row-growth + duplicate checks, writes `dq_state`) -> dq_gate (condition task; skips publish_gold when dq_problems != 0) -> publish_gold. Resource names: dev = `claims_pipeline_bundle` / `claims_daily_bundle`, prod = `prod_claims_pipeline_bundle` / `prod_claims_daily_bundle`. Jobs are UI-locked (bundle-managed) — edit the YAML and redeploy, never edit in the UI.
+
 ## How to run
 
 - **Validate code:** start a dry run from the pipeline editor (fast, no data written)
 - **Build/refresh datasets:** run a pipeline update; use a selective refresh to rebuild only gold or a subset of datasets
 - **Full refresh:** drops and rebuilds tables from scratch — use only when necessary (e.g. after changing a dataset type)
+- **Deploy per environment:** use the bundle commands in the R6 section above (gold tables are batch-built by the job's `publish_gold` task, not by the pipeline)
 
 ## Operational notes
 
-- Catalog is injected via the pipeline `configuration` key `catalog_name` (default `claims`)
+- Catalog is injected via the pipeline `configuration` key `target_catalog` (default `claims`; legacy `catalog_name` was dropped in R6), plus `source_catalog` for the landing-volume paths in bronze
 - Batch reads of published pipeline datasets inside pipeline code use fully qualified names (bare names resolve to the default schema); temporary views resolve bare
 - `CREATE OR REFRESH TEMPORARY VIEW` is not valid SDP syntax — use `CREATE TEMPORARY VIEW`
 - Adding `dropDuplicates` to a streaming table can require a full refresh of that dataset (stateful operator state directory)

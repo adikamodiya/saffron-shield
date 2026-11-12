@@ -1,0 +1,44 @@
+# R6: Job resource - the same task chain as the hand-built claims_daily job
+# (ingest -> pipeline -> dq_check -> dq_gate -> publish_gold), named differently.
+# dq_check and publish_gold receive the target catalog as a base parameter, so the
+# same notebook code serves dev and prod without duplication.
+resources:
+  jobs:
+    claims_daily_bundle:
+      name: ${var.name_prefix}claims_daily_bundle
+      tasks:
+        - task_key: ingest
+          notebook_task:
+            notebook_path: ${workspace.file_path}/ingest
+
+        - task_key: pipeline
+          depends_on:
+            - task_key: ingest
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.claims_pipeline_bundle.id}
+
+        - task_key: dq_check
+          depends_on:
+            - task_key: pipeline
+          notebook_task:
+            notebook_path: ${workspace.file_path}/dq_check
+            base_parameters:
+              catalog: ${var.target_catalog}
+              expected_new_rows: "120"
+
+        - task_key: dq_gate
+          depends_on:
+            - task_key: dq_check
+          condition_task:
+            left: "{{tasks.dq_check.values.dq_problems}}"
+            op: "EQUAL_TO"
+            right: "0"
+
+        - task_key: publish_gold
+          depends_on:
+            - task_key: dq_gate
+              outcome: "true"
+          notebook_task:
+            notebook_path: ${workspace.file_path}/publish_gold
+            base_parameters:
+              catalog: ${var.target_catalog}

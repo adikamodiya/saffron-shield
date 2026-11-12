@@ -1,7 +1,9 @@
 from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 
-CATALOG = spark.conf.get("catalog_name", "claims")
+# Target catalog: the bundle passes `target_catalog`; defaults to `claims`
+# when the conf is not set (e.g. the legacy hand-built pipeline).
+CATALOG = spark.conf.get("target_catalog", "claims")
 
 
 def _title_case(col: str):
@@ -270,15 +272,32 @@ def claims_flagged():
 
     # Q-B date ordering: admission/discharge/submitted are mandatory (missing
     # fails, consistent with Q-C/Q-E); admission <= discharge; settled >=
-    # submitted when settled_ts is present (state-dependent).
+    # submitted when settled_ts is present (state-dependent). All event dates
+    # must fall inside the FY window 2025-07-01..2026-06-30 (BETWEEN is
+    # inclusive on both ends). Date columns use date bounds; timestamp columns
+    # use end-of-day 2026-06-30 23:59:59.999999 so events on the last day of
+    # the window are kept (a bare '2026-06-30' casts to midnight and drops
+    # them). The settled_ts window check is state-dependent: NULL passes,
+    # otherwise NULL would propagate through the whole AND chain and make
+    # every unsettled claim fail (or silently NULL) Q-B.
+    fy_start_date = F.lit("2025-07-01").cast("date")
+    fy_end_date = F.lit("2026-06-30").cast("date")
+    fy_start_ts = F.lit("2025-07-01 00:00:00").cast("timestamp")
+    fy_end_ts = F.lit("2026-06-30 23:59:59.999999").cast("timestamp")
     passes_q_b = (
         F.col("admission_date").isNotNull()
         & F.col("discharge_date").isNotNull()
         & F.col("submitted_ts").isNotNull()
         & (F.col("admission_date") <= F.col("discharge_date"))
+        & F.col("admission_date").between(fy_start_date, fy_end_date)
+        & F.col("discharge_date").between(fy_start_date, fy_end_date)
+        & F.col("submitted_ts").between(fy_start_ts, fy_end_ts)
         & (
             F.col("settled_ts").isNull()
-            | (F.col("settled_ts") >= F.col("submitted_ts"))
+            | (
+                F.col("settled_ts").between(fy_start_ts, fy_end_ts)
+                & (F.col("settled_ts") >= F.col("submitted_ts"))
+            )
         )
     )
 
@@ -337,7 +356,9 @@ def claims_flagged():
     #      stay (datediff = 0) counts as 1 billed day - 288 legit same-day
     #      claims in the source use that convention, so bare datediff
     #      equality would falsely quarantine them;
-    #   4. always: room rent component cannot exceed the billed amount.
+    #   4. always: room rent component cannot exceed the billed amount, and
+    #      the claim cannot be submitted before the admission date (timestamp
+    #      vs date compares at admission midnight).
     passes_q_e = (
         F.col("room_rent_per_day").isNotNull()
         & F.col("room_days").isNotNull()
@@ -345,6 +366,7 @@ def claims_flagged():
         & F.col("admission_date").isNotNull()
         & (F.col("room_days") >= 1)
         & (F.col("room_rent_per_day") * F.col("room_days") <= F.col("billed_amount"))
+        & (F.col("submitted_ts") >= F.to_timestamp(F.col("admission_date")))
         & (
             F.col("discharge_date").isNull()
             | (

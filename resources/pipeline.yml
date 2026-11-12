@@ -1,0 +1,23 @@
+# R6: SDP pipeline resource - runs on serverless compute, named differently from
+# the hand-built claims pipeline. One copy of transformations/bronze.sql and
+# transformations/silver.py; the catalog names are injected per target via the
+# pipeline configuration (target_catalog / source_catalog), which the code reads
+# with spark.conf.get / ${...} placeholders.
+resources:
+  pipelines:
+    claims_pipeline_bundle:
+      name: ${var.name_prefix}claims_pipeline_bundle
+      catalog: ${var.target_catalog}
+      schema: bronze
+      serverless: true
+      photon: true
+      channel: CURRENT
+      continuous: false
+      libraries:
+        - file:
+            path: ../saffron-shield-1/transformations/bronze.sql
+        - file:
+            path: ../saffron-shield-1/transformations/silver.py
+      configuration:
+        target_catalog: ${var.target_catalog}
+        source_catalog: ${var.source_catalog}

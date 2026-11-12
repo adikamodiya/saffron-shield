@@ -1,11 +1,5 @@
 -- Databricks notebook source
--- drop table claims.gold.hospital_monthly_designer;
-
-select * from claims.gold.hospital_monthly;
-
--- COMMAND ----------
-
-select claim_id , failed_rules  from claims.silver.claims_quarantine ;
+select max(billed_amount) , max(settled_ts) , max(admission_date) ,max(discharge_date),max(submitted_ts) from claims.bronze.claims;
 
 -- COMMAND ----------
 

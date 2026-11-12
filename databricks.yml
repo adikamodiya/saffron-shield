@@ -1,0 +1,37 @@
+# Saffron Shield - Declarative Automation Bundle (R6: Deployable project)
+# Repo-root bundle definition. The pipeline and job are defined in resources/*.yml.
+# One codebase; the target catalog is swapped per environment via variables.
+
+bundle:
+  name: saffron-shield
+
+include:
+  - resources/*.yml
+
+variables:
+  target_catalog:
+    description: >-
+      Catalog the pipeline writes bronze/silver/gold tables to, and the one the
+      job's dq_check / publish_gold tasks read from and publish into.
+    default: claims
+  source_catalog:
+    description: >-
+      Catalog holding the shared raw landing volume (/Volumes/<source_catalog>/raw/landing)
+      that the pipeline's bronze Auto Loader reads from.
+    default: claims
+  name_prefix:
+    description: >-
+      Prefix prepended to resource names so dev and prod deployments don't
+      collide (pipeline names must be unique workspace-wide).
+    default: ""
+
+targets:
+  dev:
+    variables:
+      target_catalog: claims_dev
+      source_catalog: claims
+  prod:
+    variables:
+      target_catalog: claims_prod
+      source_catalog: claims
+      name_prefix: prod_

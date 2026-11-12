@@ -1,0 +1,80 @@
+# R6 — Deployable project (Declarative Automation Bundle)
+# Evidence log — saffron-shield bundle
+# Order used: (1) validity check -> (2) deploy + run dev -> (3) deploy + run prod
+# All commands executed live on 2026-11-12 from the bundle root:
+# /Workspace/Users/adikamodiya@gmail.com/Projects/saffron-shield
+
+bundle: saffron-shield (git: github.com/adikamodiya/saffron-shield, branch main, commit b905640)
+targets: dev -> claims_dev | prod -> claims_prod (source_catalog: claims for both)
+resources: pipeline claims_pipeline_bundle (serverless, photon, ADVANCED edition, channel CURRENT)
+           job claims_daily_bundle (tasks: ingest -> pipeline -> dq_check -> dq_gate -> publish_gold,
+           with catalog=${var.target_catalog} passed to dq_check/publish_gold)
+
+=======================================================================
+## STEP 1 — Validity check (run BEFORE any deploy)
+=======================================================================
+$ databricks bundle validate -o json --target dev
+  -> Validation OK. Resolved: pipeline catalog=claims_dev, schema=bronze, serverless=true;
+     configuration {target_catalog: claims_dev, source_catalog: claims};
+     job tasks [ingest, pipeline, dq_check, dq_gate(condition), publish_gold],
+     dq_check/publish_gold base_parameters {catalog: claims_dev}.
+
+$ databricks bundle validate --target prod
+  -> Validation OK! (Target: prod, Path: .bundle/saffron-shield/prod)
+
+Issues found and fixed during validity check (then re-validated clean):
+ - pipeline library paths resolved relative to resources/ -> changed to
+   ../saffron-shield-1/transformations/{bronze.sql,silver.py}
+ - pipeline_id cross-reference -> ${resources.pipelines.claims_pipeline_bundle.id}
+
+=======================================================================
+## STEP 2 — Deploy + run DEV
+=======================================================================
+$ databricks bundle deploy -t dev
+  -> Current Deployment Version:
+     https://dbc-2bd5e4bd-405a.cloud.databricks.com/deployments/1755813256352620?version=1
+     Created pipelines.claims_pipeline_bundle
+     Created jobs.claims_daily_bundle
+     Files: 1 uploaded, 0 deleted
+     Resources: 2 created, 0 changed, 0 deleted, 0 unchanged
+
+$ databricks bundle run claims_daily_bundle -t dev
+  -> Run URL: https://dbc-2bd5e4bd-405a.cloud.databricks.com/jobs/596698682606174/runs/860535738612749?o=7474659560736194
+     2026-11-12 06:36:58 "claims_daily_bundle" RUNNING
+     2026-11-12 06:40:35 "claims_daily_bundle" TERMINATED SUCCESS
+     (all tasks ran, publish_gold NOT skipped)
+
+Dev gold output (claims_dev):
+  claims_enriched   : 3046 rows (built by the bundle job)
+  hospital_monthly  : 469 rows, same shape as main/Paper 1
+                     (hospital_id, admission_month, claim_count, total_billed,
+                      total_approved, rejected_count)
+
+=======================================================================
+## STEP 3 — Deploy + run PROD
+=======================================================================
+$ databricks bundle deploy -t prod --auto-approve
+<PENDING — final user authorization for prod deploy>
+
+$ databricks bundle run claims_daily_bundle -t prod
+<PENDING>
+
+=======================================================================
+## PASS GATE — gold facts matching main claims catalog
+=======================================================================
+Root cause of the original 44-row dev-vs-main mismatch (before this session):
+ - claims_dev.silver == claims.silver exactly (scd1 3120=3120, claims_clean 3046=3046).
+ - The 44 differing rows (all batch_007.json) failed the Q-B FY-window date rule in the
+   CURRENT silver logic of BOTH catalogs -> both silvers correctly exclude them.
+ - claims.gold.claims_enriched (3090) was stale: last published before the Q-B rule
+   existed (the R5 CLI run skipped publish_gold via the dq gate).
+
+Fix applied (2026-11-12, user-confirmed): re-ran the publish_gold logic with
+catalog=claims (CREATE OR REPLACE from current claims.silver, R1 row filter re-attached).
+
+Post-refresh pass-gate results (main vs dev):
+  claims_enriched   : claims 3046  ==  claims_dev 3046   -> MATCH
+  hospital_monthly  : claims 469   ==  claims_dev 469    -> MATCH
+  claim_id EXCEPT   : 0 mismatched rows                  -> MATCH
+
+<PENDING: same pass-gate for claims_prod after the prod run>
