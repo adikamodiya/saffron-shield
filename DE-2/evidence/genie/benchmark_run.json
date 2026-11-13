@@ -1,0 +1,26 @@
+{
+  "run_id": "01f1df42a7f51b1790c6c8480de9874a",
+  "space_id": "01f1df20e1131371bdf0a038bc2c33a2",
+  "execution_mode": "EXECUTION_MODE_AGENT",
+  "run_status": "DONE",
+  "summary": {
+    "num_questions": 10,
+    "num_done": 10,
+    "num_correct": 10,
+    "num_needs_review": 0,
+    "pass_bar": ">= 8 of 10",
+    "passed": true
+  },
+  "results": [
+    {"benchmark_id": "01f1df42a1a81c139c86a1629ef2186d", "question": "Which plan has the highest loss ratio over the whole year?", "eval_id": "01f1df42a7fc18c58f3cd97586212c0c", "conversation_id": "01f1df42a909130e86b85dbb50cd8b5b", "message_id": "01f1df42a90c1acb92cf5d14d70faea1", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df4183ef1ff1b8fee19e22d29567", "question": "How many claims were rejected for missing documents?", "eval_id": "01f1df42a7fc108a9a3e9a96dff6e663", "conversation_id": "01f1df42a90913d6bc7e7b2b73faa479", "message_id": "01f1df42a90c1bcea347b8b0076c518f", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df41837610389c49f6f348d269a7", "question": "Which 3 hospitals had the highest total billed amount?", "eval_id": "01f1df42a7fb1813aaf973bf5ebbeb79", "conversation_id": "01f1df42a909148096fb2ca3d1bd3fc8", "message_id": "01f1df42a90c1c18801b73060a16edd8", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df41833815e3818825c2f55ff739", "question": "How many claims were at hospitals that were out of network on the admission date?", "eval_id": "01f1df42a7fa1f77b44189b48014b04e", "conversation_id": "01f1df42a90912a5a25ef5d0ecad6fdc8", "message_id": "01f1df42a90b1cba826a2608ec4958ff", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df4182fd1a12a591b3c9774f929b", "question": "What is the average turnaround in days for settled cashless claims?", "eval_id": "01f1df42a7fa16fca021e02012b4a0ac", "conversation_id": "01f1df42bda0149c1f9fd006dd2f451516", "message_id": "01f1df42bda21f4755a9f5faf89539432c", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df4182c21c19b8236a8164287568", "question": "What is the total amount paid on settled claims for the GOLD_IND plan?", "eval_id": "01f1df42a7f91e909628d47db745874", "conversation_id": "01f1df42c484176593e941a5d5c441bca", "message_id": "01f1df42c487118bb4c52bc0f422a816", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df41828210c8ac84f9c94309ae08", "question": "How many settled claims came from metro and from non-metro hospitals?", "eval_id": "01f1df42a7f915d8a2834fdc59bb3153", "conversation_id": "01f1df42cad81ce48ac6b7d17b38d17d", "message_id": "01f1df42cadb1c6eaf1c137fecce9fee", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df41824211988e5c113aa4d18b49", "question": "What is the rejection rate for each plan?", "eval_id": "01f1df42a7f81d2897b1de2ac64d0e35", "conversation_id": "01f1df42d13711b98f1751945a5bed60", "message_id": "01f1df42d13a1aa1b0099579a1a707a5", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df4182061688ac7b1d95068d4c71", "question": "What is the overall claim rejection rate?", "eval_id": "01f1df42a7f812749941e56dcb122c56", "conversation_id": "01f1df42d78e18829958f73d8c6f142c", "message_id": "01f1df42d7971df192f5b5088afdc3f1", "status": "DONE", "score": 100, "correct": true},
+    {"benchmark_id": "01f1df4181ca19cb81ebd5d9b5a50583", "question": "How many claims were admitted in March 2026?", "eval_id": "01f1df42a7f7193893d534c69a43d94f", "conversation_id": "01f1df42dde514d5b2376de18afe4ab2", "message_id": "01f1df42dde9131db4313dc1df32ade5", "status": "DONE", "score": 100, "correct": true}
+  ]
+}

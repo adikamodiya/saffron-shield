@@ -1,0 +1,27 @@
+{
+  "id": "1534372137366428",
+  "display_name": "claims_week_rejection_alert",
+  "owner_user_name": "adikamodiya@gmail.com",
+  "create_time": "2026-11-13T06:32:58Z",
+  "update_time": "2026-11-13T06:49:15Z",
+  "parent_path": "/Workspace/Users/adikamodiya@gmail.com",
+  "query_text": "SELECT MAX(rejection_rate) AS max_rejection_rate\nFROM claims.analytics.weekly_rejection_rate\nWHERE week_start = DATE'2026-06-22'",
+  "warehouse_id": "71f0d0fa960a022d",
+  "evaluation": {
+    "source": { "name": "max_rejection_rate" },
+    "comparison_operator": "GREATER_THAN",
+    "threshold": { "value": { "double_value": 0.18 } },
+    "notification": {
+      "subscriptions": [ { "user_email": "adikamodiya@gmail.com" } ]
+    },
+    "state": "TRIGGERED",
+    "last_evaluated_at": "2026-11-13T06:37:45Z"
+  },
+  "schedule": {
+    "quartz_cron_schedule": "0 0 8 * * ?",
+    "timezone_id": "Asia/Calcutta"
+  },
+  "lifecycle_state": "ACTIVE",
+  "effective_run_as": { "user_name": "adikamodiya@gmail.com" },
+  "custom_template_format": "MARKDOWN"
+}

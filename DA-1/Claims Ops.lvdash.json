@@ -1,0 +1,633 @@
+{
+  "datasets": [
+    {
+      "name": "claims_ops_metrics",
+      "displayName": "Claims Ops Metrics",
+      "config": {
+        "source": "claims.analytics.mv_claims",
+        "measures": [
+          {
+            "name": "claim_count",
+            "expr": "MEASURE(source.claim_count)"
+          },
+          {
+            "name": "total_approved_amount",
+            "expr": "MEASURE(source.approved_amount)"
+          },
+          {
+            "name": "rejection_rate",
+            "expr": "MEASURE(source.rejection_rate)"
+          },
+          {
+            "name": "avg_turnaround_days",
+            "expr": "MEASURE(source.avg_turnaround_days)"
+          },
+          {
+            "name": "rejected_count",
+            "expr": "MEASURE(source.rejected_count)"
+          }
+        ],
+        "version": "1.1",
+        "comment": "Claims Ops dashboard metrics layer. Single source of truth is claims.analytics.mv_claims (R4 certified definitions); this layer only renames fields for the dashboard and adds no formulas of its own.",
+        "dimensions": [
+          {
+            "name": "admission_month",
+            "expr": "CAST(source.admission_month AS DATE)"
+          },
+          {
+            "name": "plan_code_at_admission",
+            "expr": "source.plan_code"
+          },
+          {
+            "name": "hospital_city_tier",
+            "expr": "source.city_tier"
+          },
+          {
+            "name": "hospital_id",
+            "expr": "source.hospital_id"
+          },
+          {
+            "name": "hospital_city",
+            "expr": "source.hospital_city"
+          },
+          {
+            "name": "claim_type",
+            "expr": "source.claim_type"
+          },
+          {
+            "name": "status",
+            "expr": "source.status"
+          },
+          {
+            "name": "rejection_code",
+            "expr": "source.rejection_code"
+          }
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "name": "1dfa62fd",
+      "displayName": "Page 1",
+      "layout": [
+        {
+          "widget": {
+            "name": "kpi_total_claims",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "measure(claim_count)",
+                      "expression": "MEASURE(`claim_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Total Claims"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(claim_count)",
+                  "format": {
+                    "abbreviation": "none",
+                    "type": "number-plain"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_approved_amount",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "measure(total_approved_amount)",
+                      "expression": "MEASURE(`total_approved_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Total Approved Amount"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(total_approved_amount)",
+                  "format": {
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "places": 1,
+                      "type": "max"
+                    },
+                    "type": "number-plain"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_rejection_rate",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "measure(rejection_rate)",
+                      "expression": "MEASURE(`rejection_rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Rejection Rate"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(rejection_rate)",
+                  "format": {
+                    "decimalPlaces": {
+                      "places": 2,
+                      "type": "max"
+                    },
+                    "type": "number-percent"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_avg_turnaround",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "measure(avg_turnaround_days)",
+                      "expression": "MEASURE(`avg_turnaround_days`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Avg Turnaround (Days)"
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(avg_turnaround_days)",
+                  "format": {
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "places": 1,
+                      "type": "max"
+                    },
+                    "type": "number-plain"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter_plan",
+            "queries": [
+              {
+                "name": "dashboards/01f1df0b040d161388885252e8f3b7bc/datasets/01f1df0b46c2185d8fb5259d543a2d29_plan_code_at_admission",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "plan_code_at_admission",
+                      "expression": "`plan_code_at_admission`"
+                    },
+                    {
+                      "name": "plan_code_at_admission_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "scale": {
+                "sort": {
+                  "by": "natural-order"
+                },
+                "type": "categorical"
+              },
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Plan"
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "plan_code_at_admission",
+                    "queryName": "dashboards/01f1df0b040d161388885252e8f3b7bc/datasets/01f1df0b46c2185d8fb5259d543a2d29_plan_code_at_admission"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter_city_tier",
+            "queries": [
+              {
+                "name": "dashboards/01f1df0b040d161388885252e8f3b7bc/datasets/01f1df0b46c2185d8fb5259d543a2d29_hospital_city_tier",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "hospital_city_tier",
+                      "expression": "`hospital_city_tier`"
+                    },
+                    {
+                      "name": "hospital_city_tier_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "scale": {
+                "sort": {
+                  "by": "natural-order"
+                },
+                "type": "categorical"
+              },
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "City Tier"
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "hospital_city_tier",
+                    "queryName": "dashboards/01f1df0b040d161388885252e8f3b7bc/datasets/01f1df0b46c2185d8fb5259d543a2d29_hospital_city_tier"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "filter_admission_month",
+            "queries": [
+              {
+                "name": "dashboards/01f1df0b040d161388885252e8f3b7bc/datasets/01f1df0b46c2185d8fb5259d543a2d29_admission_month",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "admission_month",
+                      "expression": "`admission_month`"
+                    },
+                    {
+                      "name": "admission_month_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Admission Month"
+              },
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "admission_month",
+                    "queryName": "dashboards/01f1df0b040d161388885252e8f3b7bc/datasets/01f1df0b46c2185d8fb5259d543a2d29_admission_month"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 2,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "trend_monthly",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "admission_month",
+                      "expression": "`admission_month`"
+                    },
+                    {
+                      "name": "measure(claim_count)",
+                      "expression": "MEASURE(`claim_count`)"
+                    },
+                    {
+                      "name": "measure(rejected_count)",
+                      "expression": "MEASURE(`rejected_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Monthly Claims Trend"
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "admission_month",
+                  "axis": {
+                    "title": "Admission Month"
+                  },
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "axis": {
+                    "title": "Claims"
+                  },
+                  "fields": [
+                    {
+                      "fieldName": "measure(claim_count)",
+                      "displayName": "Total Claims"
+                    },
+                    {
+                      "fieldName": "measure(rejected_count)",
+                      "displayName": "Rejected Claims"
+                    }
+                  ],
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 8,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "rejection_codes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "measure(claim_count)",
+                      "expression": "MEASURE(`claim_count`)"
+                    },
+                    {
+                      "name": "rejection_code",
+                      "expression": "`rejection_code`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`status` IN ('rejected')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Rejections by Code"
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "measure(claim_count)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "rejection_code",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 4,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "hospitals_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "claims_ops_metrics",
+                  "fields": [
+                    {
+                      "name": "hospital_id",
+                      "expression": "`hospital_id`"
+                    },
+                    {
+                      "name": "measure(claim_count)",
+                      "expression": "MEASURE(`claim_count`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": "Top Hospitals by Claim Count"
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "hospital_id",
+                  "axis": {
+                    "title": "Hospital",
+                    "labelAngle": 45
+                  },
+                  "scale": {
+                    "categorySize": {
+                      "number": 15,
+                      "type": "number-of-categories"
+                    },
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(claim_count)",
+                  "axis": {
+                    "title": "Claims"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 12,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}

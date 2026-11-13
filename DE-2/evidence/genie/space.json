@@ -1,0 +1,43 @@
+{
+  "space_id": "01f1df20e1131371bdf0a038bc2c33a2",
+  "title": "Saffron Shield Claims Analytics",
+  "url": "/genie/rooms/01f1df20e1131371bdf0a038bc2c33a2",
+  "warehouse_id": "71f0d0fa960a022d",
+  "data_sources": {
+    "tables": [
+      "claims.analytics.fact_claims",
+      "claims.analytics.dim_plan",
+      "claims.analytics.dim_hospital",
+      "claims.analytics.dim_member",
+      "claims.analytics.dim_date",
+      "claims.analytics.w01"
+    ],
+    "metric_views": ["claims.analytics.mv_claims"]
+  },
+  "instructions_text": "# Business context\n- fact_claims holds one row per claim. Status values: settled, approved, rejected, submitted.\n- A claim is DECIDED only when its status is approved, settled or rejected. Submitted claims are NOT decided.\n- Rejection rate = rejected / decided, where decided = approved + settled + rejected. Submitted claims are excluded from BOTH sides. Overall: 397 rejected / 2,699 decided = 0.147.\n- claims.analytics.mv_claims is the metric view that defines claim KPIs exactly once: claim_count, approved_amount, rejection_rate, rejected_count, avg_turnaround_days.\n- If you need ANY of these KPI formulas, check the metric view claims.analytics.mv_claims FIRST and query it (with MEASURE(...) for measures) instead of computing the formula yourself. Only fall back to computing from fact_claims directly if the metric view cannot answer the grouping, and in that case follow the formula rules below exactly.\n- approved_amount is only meaningful for approved and settled claims. Total approved amount across all claims = 177.76M.\n- turnaround_days is populated only for decided claims (submitted rows have NULL); the average is about 15.7 days.\n# Loss ratio (table w01)\n- claims.analytics.w01 is the pre-aggregated monthly loss ratio per plan: paid_amount = approved_amount of SETTLED claims by ADMISSION month; earned_premium = annual_premium/12 per policy version active in the month; loss_ratio = paid_amount / earned_premium (decimal like 12.45). Use w01 for any loss-ratio or paid-vs-earned question; do not recompute it from claim grain.\n# Joins and dates\n- fact_claims.plan_sk -> dim_plan.plan_sk (dim_plan = one row per POLICY VERSION; plan_sk on the fact is the plan at admission)\n- fact_claims.hospital_sk -> dim_hospital.hospital_sk (hospital_id, city, city_tier: metro / non_metro)\n- fact_claims.member_sk -> dim_member.member_sk\n- fact_claims.admission_date_key / submitted_date_key / settled_date_key -> dim_date.date_key (yyyymmdd int); monthly grouping via dim_date.month_start (DATE)\n# Answering rules\n- Always show the SQL you ran and a small result table.\n- Round monetary amounts to 2 decimals; round rates to at least 4 decimals.\n- If a question needs loss ratio or paid premium, query claims.analytics.w01.",
+  "trusted_examples": [
+    {
+      "question": "What is the overall rejection rate over decided claims?",
+      "sql": "SELECT ROUND(SUM(CASE WHEN f.status = 'rejected' THEN 1 ELSE 0 END) / CAST(SUM(CASE WHEN f.status IN ('approved','settled','rejected') THEN 1 ELSE 0 END) AS DOUBLE), 6) AS rejection_rate FROM claims.analytics.fact_claims f"
+    },
+    {
+      "question": "Show total paid amount, earned premium and loss ratio per plan",
+      "sql": "SELECT plan_code, SUM(paid_amount) AS total_paid, SUM(earned_premium) AS total_earned, ROUND(SUM(paid_amount) / SUM(earned_premium), 2) AS loss_ratio FROM claims.analytics.w01 GROUP BY plan_code ORDER BY plan_code"
+    },
+    {
+      "question": "What is the average claim turnaround time in days?",
+      "sql": "SELECT ROUND(AVG(turnaround_days), 2) AS avg_turnaround_days FROM claims.analytics.fact_claims WHERE turnaround_days IS NOT NULL"
+    },
+    {
+      "question": "How many claims fall in each status?",
+      "sql": "SELECT status, COUNT(*) AS claim_count FROM claims.analytics.fact_claims GROUP BY status ORDER BY claim_count DESC"
+    }
+  ],
+  "sample_questions": [
+    "What is the overall rejection rate across all claims?",
+    "Show the monthly loss ratio for each plan.",
+    "Which hospitals have the most rejected claims?",
+    "What is the average claim turnaround time in days?",
+    "How many claims are in each status?"
+  ]
+}
