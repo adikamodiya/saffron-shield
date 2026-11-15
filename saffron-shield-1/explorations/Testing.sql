@@ -1,18 +1,5 @@
 -- Databricks notebook source
-SELECT
-  plan_code_at_admission                            AS plan_code,
-  CAST(date_trunc('WEEK', CAST(submitted_ts AS DATE)) AS DATE) AS week_start,
-  CAST(COUNT_IF(status IN ('approved', 'settled', 'rejected')) AS INT) AS decided_count,
-  CAST(COUNT_IF(status = 'rejected') AS INT)                           AS rejected_count,
-  ROUND(
-    CAST(COUNT_IF(status = 'rejected') AS DOUBLE)
-    / NULLIF(CAST(COUNT_IF(status IN ('approved', 'settled', 'rejected')) AS INT), 0),
-    4
-  )                                                              AS rejection_rate
-FROM claims.gold.claims_enriched
-WHERE status IN ('approved', 'settled', 'rejected') and  CAST(date_trunc('WEEK', CAST(submitted_ts AS DATE)) AS DATE) = DATE'2026-06-22'
-GROUP BY plan_code_at_admission, CAST(date_trunc('WEEK', CAST(submitted_ts AS DATE)) AS DATE);
-
+drop catalog if exists tata_multi_brand cascade; 
 
 -- COMMAND ----------
 
