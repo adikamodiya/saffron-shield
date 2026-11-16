@@ -1,0 +1,3 @@
+## Weakest metric
+
+Across the 18 single-document questions, hit-rate@5 = 1.000 (threshold 0.8) and MRR = 1.000 (threshold 0.7); both clear their thresholds. The weakest measured metric is correctness/mean at 0.89 (judge scores are averaged over 18 single-document questions). It lags the retrieval metrics because judging generated text is stricter than exact chunk matching: the judge also weighs phrasing and completeness, not just whether the right chunk was cited. The retrieval side (hit-rate@5 and MRR) sits at its ceiling, so future gains must come from answer phrasing and richer cited context.

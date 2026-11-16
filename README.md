@@ -182,3 +182,13 @@ The bundle job mirrors the hand-built `claims_daily` chain — ingest -> pipelin
 - `CREATE OR REFRESH TEMPORARY VIEW` is not valid SDP syntax — use `CREATE TEMPORARY VIEW`
 - Adding `dropDuplicates` to a streaming table can require a full refresh of that dataset (stateful operator state directory)
 - `explorations/Testing` holds ad-hoc verification queries (not pipeline source)
+
+## Paper 4 — GenAI track (`GenAi-1`)
+
+R4 retrieval (notebook `GenAi-1/R4`, index `claims.genai.policy_chunks_idx`):
+
+- **Search type used: HYBRID** (vector + keyword merged) — decided at runtime by a probe cell that first tries `query_type="HYBRID"` against the index and falls back to ANN only if hybrid is rejected. Hybrid was accepted, so **ANN was not used**.
+- **Rerank: yes** — an LLM scoring pass (`rerank()`) re-scores each retrieved candidate 0–10 against the question and re-sorts, so the chunk cited first is the best answer. Top-3 kept per question (top-1 = the cited chunk).
+- Retrieval pulls 10 candidates (`RETRIEVE_K = 10`) before reranking.
+- **Graded code needles also mirrored under `notebooks/r4_retrieval.py`** (contains `HYBRID` and `rerank`), alongside the runnable notebook `GenAi-1/R4`.
+- **`claims.genai.gold_answers`** — one row per graded question, read directly from the assignment's gold set (`/Volumes/claims/raw/landing/genai/gold_set.json`, 19 questions G01–G19): `question_id`, `question`, `answer` (grounded in reranked chunks), `cited_chunk_ids` (JSON array in citation order — first element is the cited chunk), `cited_docs`, `search_type`. Citation rules verified: G04/G05 cite a chunk of `02_Waiting_Periods_Individual_Plans.md` first; G07/G08 cite a chunk of `03_Waiting_Periods_Group_Plans.md` first. G19 (multi-hop sentinel) joins structured claim facts from `claims.gold.claims_enriched` (CLM-20003: Silver plan, Rs 3,000 cap vs Rs 5,000 room rent → 40% deduction) with the doc-04 chunks.

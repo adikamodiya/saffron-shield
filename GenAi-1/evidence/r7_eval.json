@@ -1,0 +1,13 @@
+{
+  "hit_rate_at_5": 1.0,
+  "mrr": 1.0,
+  "n_questions": 18,
+  "mlflow_experiment_id": "3682367199677934",
+  "eval_run_id": "98a8b3ae27f14881a58838d8ef938fcb",
+  "judges_status": "ran",
+  "judges": {
+    "correctness/mean": 0.8888888888888888,
+    "retrieval_groundedness/mean": 1.0,
+    "relevance_to_query/mean": 1.0
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "chat_databricks_reply": "Here is the extracted information in the required JSON format:\n\n```\n{\n  \"doc_name\": \"02_Waiting_Periods_Individual_Plans.md\",\n  \"plan_family\": \"individual\",\n  \"initial_waiting_days\": 30,\n  \"ped_waiting_months\": 36\n}\n```Here is the extracted information in the required JSON format:\n\n```\n{\n  \"doc_name\": \"03_Waiting_Periods_Group_Plans.md\",\n  \"plan_family\": \"group\",\n  \"initial_waiting_days\": 0,\n  \"ped_waiting_months\": 12\n}\n```",
+  "chat_openai_reply": "Here is the extracted information in the required JSON format:\n\n```\n{\n  \"doc_name\": \"02_Waiting_Periods_Individual_Plans.md\",\n  \"plan_family\": \"individual\",\n  \"initial_waiting_days\": 30,\n  \"ped_waiting_months\": 36\n}\n```Here is the extracted information in the required JSON format:\n\n```\n{\n  \"doc_name\": \"03_Waiting_Periods_Group_Plans.md\",\n  \"plan_family\": \"group\",\n  \"initial_waiting_days\": 0,\n  \"ped_waiting_months\": 12\n}\n```",
+  "waiting_facts": [
+    {
+      "doc_name": "02_Waiting_Periods_Individual_Plans.md",
+      "plan_family": "individual",
+      "initial_waiting_days": 30,
+      "ped_waiting_months": 36
+    },
+    {
+      "doc_name": "03_Waiting_Periods_Group_Plans.md",
+      "plan_family": "group",
+      "initial_waiting_days": 0,
+      "ped_waiting_months": 12
+    }
+  ]
+}

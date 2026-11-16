@@ -1,0 +1,39 @@
+{
+  "turns": [
+    {
+      "turn": 1,
+      "question": "What is the pre-existing disease waiting period on an individual plan?",
+      "standalone_question": "What is the pre-existing disease waiting period on an individual plan?",
+      "answer": "The pre-existing disease waiting period on an individual plan is 36 months of continuous cover [02_Waiting_Periods_Individual_Plans.md#pre-existing-disease-waiting-period], [02_Waiting_Periods_Individual_Plans.md#how-the-waiting-period-is-checked]. This applies to individual plans, including Silver and Gold [02_Waiting_Periods_Individual_Plans.md#pre-existing-disease-waiting-period], [02_Waiting_Periods_Individual_Plans.md#how-the-waiting-period-is-checked], but note that the Senior plan has a different waiting period [02_Waiting_Periods_Individual_Plans.md#senior-plan].",
+      "cited_chunk_ids": [
+        "02_Waiting_Periods_Individual_Plans.md#pre-existing-disease-waiting-period",
+        "02_Waiting_Periods_Individual_Plans.md#how-the-waiting-period-is-checked",
+        "02_Waiting_Periods_Individual_Plans.md#senior-plan"
+      ]
+    },
+    {
+      "turn": 2,
+      "question": "Does moving from Silver to Gold restart that count?",
+      "standalone_question": "Does moving from a Silver individual plan to a Gold individual plan restart the 36-month pre-existing disease waiting period on the individual plan?",
+      "answer": "Moving from a Silver individual plan to a Gold individual plan does not restart the 36-month pre-existing disease waiting period on the individual plan [02_Waiting_Periods_Individual_Plans.md#pre-existing-disease-waiting-period]. The months are counted from the first policy start date with Saffron Shield, in completed months. This information is specific to individual plans, including Silver and Gold [02_Waiting_Periods_Individual_Plans.md#pre-existing-disease-waiting-period], [03_Waiting_Periods_Group_Plans.md#moving-to-an-individual-plan], and applies to all Saffron Shield plans [01_Claims_Process_Overview.md#the-four-adjudication-facts].",
+      "cited_chunk_ids": [
+        "02_Waiting_Periods_Individual_Plans.md#pre-existing-disease-waiting-period",
+        "03_Waiting_Periods_Group_Plans.md#moving-to-an-individual-plan",
+        "01_Claims_Process_Overview.md#the-four-adjudication-facts"
+      ]
+    },
+    {
+      "turn": 3,
+      "question": "And for group plans?",
+      "standalone_question": "Does moving from a Silver individual plan to a Gold individual plan or switching to a group plan restart the 36-month pre-existing disease waiting period on the health insurance policy?",
+      "answer": "The context provided does not directly address the waiting period for individual plans or switching from an individual plan to a group plan [03_Waiting_Periods_Group_Plans.md#pre-existing-disease-waiting-period], [03_Waiting_Periods_Group_Plans.md#how-the-waiting-period-is-checked], [03_Waiting_Periods_Group_Plans.md#initial-waiting-period]. However, it does specify the waiting period rules for Corporate Group plans, which have a 12-month waiting period for pre-existing diseases.",
+      "cited_chunk_ids": [
+        "03_Waiting_Periods_Group_Plans.md#pre-existing-disease-waiting-period",
+        "03_Waiting_Periods_Group_Plans.md#how-the-waiting-period-is-checked",
+        "03_Waiting_Periods_Group_Plans.md#initial-waiting-period"
+      ]
+    }
+  ],
+  "summary": "For individual Saffron Shield plans, including Silver and Gold, there is a 36-month waiting period for pre-existing diseases that starts from the initial policy date and continues uninterrupted even if the customer upgrades their plan. In contrast, Corporate Group plans have a 12-month waiting period for pre-existing diseases. The waiting period rules for switching from an individual plan to a group plan or for other types of group plans are not specified in the provided context.",
+  "trace_id": "tr-586578ed511b48e6a02909febf3992f2"
+}
