@@ -1,0 +1,32 @@
+{
+  "transport": "stdio",
+  "server": "stdio: python /Workspace/Users/custom001x@gmail.com/saffron-shield/GenAi-2/agent/mcp_stdio_server.py on SQL warehouse 78d419cb76b1d7e9 (managed https://dbc-de868f4b-f279.cloud.databricks.com/api/2.0/mcp/functions/claims/genai not enabled in this workspace: Public Preview off)",
+  "tools": [
+    "lookup_claim",
+    "plan_at",
+    "search_policy",
+    "compute_payable"
+  ],
+  "calls": [
+    {
+      "tool": "lookup_claim",
+      "arguments": {
+        "claim_id": "CLM-20001"
+      },
+      "result": "[{\"claim_id\": \"CLM-20001\", \"member_id\": \"MEM-0491\", \"policy_id\": \"POL-0491\", \"hospital_id\": \"HOS-005\", \"status\": \"submitted\", \"claim_type\": \"cashless\", \"admission_date\": \"2026-03-10\", \"discharge_date\": \"2026-03-14\", \"billed_amount\": \"180000.0\", \"approved_amount\": null, \"rejection_code\": null, \"is_pre_existing\": \"true\", \"plan_code_at_admission\": \"CORP_GROUP\", \"plan_family\": \"group\", \"room_rent_per_day\": \"4000\", \"room_rent_cap_per_day\": \"5000\", \"room_rent_over_cap\": \"false\", \"policy_start_date\": \"2025-01-10\", \"policy_tenure_months\": \"14\", \"days_since_policy_start\": \"424\", \"is_network_at_admission\": \"true\"}]"
+    },
+    {
+      "tool": "compute_payable",
+      "arguments": {
+        "plan_code": "CORP_GROUP",
+        "is_pre_existing": true,
+        "policy_tenure_months": 14,
+        "days_since_policy_start": 424,
+        "is_network_at_admission": true,
+        "room_rent_per_day": 4000,
+        "billed_amount": 180000.0
+      },
+      "result": "{\"plan_code\":\"CORP_GROUP\",\"room_rent_cap_per_day\":5000,\"room_rent_over_cap\":false,\"waiting_period_ok\":true,\"payable\":true,\"network_at_admission\":true,\"room_rent_deduction_pct\":0.00,\"copay_pct\":0,\"reason\":\"PAYABLE_IN_FULL\",\"payable_amount\":180000.00}"
+    }
+  ]
+}

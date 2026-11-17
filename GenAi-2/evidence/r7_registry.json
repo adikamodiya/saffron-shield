@@ -1,0 +1,24 @@
+{
+  "mode": "uc",
+  "model": "claims.genai.claims_agent",
+  "versions": [
+    {
+      "version": "9",
+      "agent_version": 1,
+      "system_prompt_sha": "9d7623f004ea"
+    },
+    {
+      "version": "10",
+      "agent_version": 2,
+      "system_prompt_sha": "47371a1d0f83",
+      "alias": "champion"
+    }
+  ],
+  "endpoint": "claims-agent",
+  "served_version": "10",
+  "screenshot": "evidence/screenshots/r7_endpoint.png",
+  "runs": {
+    "v1": "41ab0044e42040429fe5d0ef26f8cf41",
+    "v2": "8ca07a38be39415785e71934e768d7b4"
+  }
+}

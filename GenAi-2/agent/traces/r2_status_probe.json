@@ -1,0 +1,20 @@
+{
+  "trace_id": "tr-a6b3240deb3da89f5dc0c7edc3e27dfe",
+  "tool_calls": [
+    {
+      "name": "lookup_claim",
+      "args": {
+        "claim_id": "CLM-10642"
+      }
+    },
+    {
+      "name": "plan_at",
+      "args": {
+        "member_id": "MEM-0172",
+        "as_of_date": "2026-01-25"
+      }
+    }
+  ],
+  "final_answer": "The status of claim CLM-10642 is \"settled\".",
+  "cited_chunk_ids": []
+}

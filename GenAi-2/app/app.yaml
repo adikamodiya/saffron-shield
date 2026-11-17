@@ -1,0 +1,10 @@
+# R8 - claims-agent-chat app config.
+# Resource key "serving-endpoint" (created on the app, pointing at the claims-agent serving
+# endpoint with CAN_QUERY for the app's service principal) is wired to the SERVING_ENDPOINT
+# env var via valueFrom, exactly as the R8 spec requires.
+command:
+- python
+- app.py
+env:
+- name: SERVING_ENDPOINT
+  valueFrom: serving-endpoint

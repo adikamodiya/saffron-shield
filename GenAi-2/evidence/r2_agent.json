@@ -1,0 +1,29 @@
+{
+  "requirement": "GenAi-2 R2 - tool-calling traced agent",
+  "system_prompt": "/Workspace/Users/custom001x@gmail.com/saffron-shield/GenAi-2/agent/prompts/system_v1.md",
+  "system_prompt_words": 196,
+  "traces": {
+    "r2_status_probe.json": {
+      "trace_id": "tr-a6b3240deb3da89f5dc0c7edc3e27dfe",
+      "tool_calls": [
+        "lookup_claim",
+        "plan_at"
+      ],
+      "stored_status": "settled"
+    },
+    "r2_policy_probe.json": {
+      "trace_id": "tr-f18d2b41b0bbf82fcb555d70b678899a",
+      "tool_calls": [
+        "search_policy"
+      ],
+      "cited_chunk_ids": [
+        "03_Waiting_Periods_Group_Plans.md#how-the-waiting-period-is-checked",
+        "03_Waiting_Periods_Group_Plans.md#pre-existing-disease-waiting-period",
+        "03_Waiting_Periods_Group_Plans.md#initial-waiting-period",
+        "03_Waiting_Periods_Group_Plans.md#overview",
+        "03_Waiting_Periods_Group_Plans.md#moving-to-an-individual-plan"
+      ]
+    }
+  },
+  "mlflow_experiment_id": "2378735593525300"
+}

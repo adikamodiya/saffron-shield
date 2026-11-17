@@ -1,0 +1,19 @@
+{
+  "trace_id": "tr-f18d2b41b0bbf82fcb555d70b678899a",
+  "tool_calls": [
+    {
+      "name": "search_policy",
+      "args": {
+        "query": "corporate group plan pre-existing disease waiting period"
+      }
+    }
+  ],
+  "final_answer": "The pre-existing disease (PED) waiting period for a corporate group plan is 12 months of continuous cover. The months are counted from the first policy start date with Saffron Shield, in completed months. \n\nSources: 03_Waiting_Periods_Group_Plans.md#how-the-waiting-period-is-checked, 03_Waiting_Periods_Group_Plans.md#pre-existing-disease-waiting-period, 03_Waiting_Periods_Group_Plans.md#initial-waiting-period, 03_Waiting_Periods_Group_Plans.md#overview, 03_Waiting_Periods_Group_Plans.md#moving-to-an-individual-plan",
+  "cited_chunk_ids": [
+    "03_Waiting_Periods_Group_Plans.md#how-the-waiting-period-is-checked",
+    "03_Waiting_Periods_Group_Plans.md#pre-existing-disease-waiting-period",
+    "03_Waiting_Periods_Group_Plans.md#initial-waiting-period",
+    "03_Waiting_Periods_Group_Plans.md#overview",
+    "03_Waiting_Periods_Group_Plans.md#moving-to-an-individual-plan"
+  ]
+}

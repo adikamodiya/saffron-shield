@@ -1,0 +1,20 @@
+{
+  "requirement": "GenAi-2 R1 - tools as UC functions",
+  "functions": [
+    "claims.genai.lookup_claim(claim_id STRING) -> 21-column claim facts row + days_since_policy_start",
+    "claims.genai.plan_at(member_id STRING, as_of_date DATE) -> one row of plan terms valid on the date",
+    "claims.genai.search_policy(query STRING) -> hybrid keyword+vector, <= 5 chunks best first",
+    "claims.genai.compute_payable(plan_code, is_pre_existing, policy_tenure_months, days_since_policy_start, is_network_at_admission, room_rent_per_day, billed_amount) -> JSON string; never calls a model"
+  ],
+  "client_files_present": [
+    "guardrail_probes.json",
+    "memory_probes.json",
+    "adjudication_probe_claims.csv"
+  ],
+  "answer_key_check": {
+    "probe_claims": 20,
+    "mismatches_vs_verified_rules_engine": 0
+  },
+  "determinism_check": "pass (compute_payable + search_policy byte-identical on repeat calls)",
+  "clm_10642_present": true
+}

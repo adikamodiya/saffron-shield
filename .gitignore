@@ -1,0 +1,5 @@
+# MLflow experiment folder - not a Git-folder-supported asset
+genai2-agent
+
+# Databricks checksum sidecars
+*.crc

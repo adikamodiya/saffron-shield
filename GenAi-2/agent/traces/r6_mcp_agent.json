@@ -1,0 +1,10 @@
+{
+  "trace_id": "tr-3451ca29048244928bdb1d7fa9f71496",
+  "tool_calls": [
+    "lookup_claim",
+    "plan_at",
+    "compute_payable"
+  ],
+  "final_answer": "The status of claim CLM-20001 is \"submitted\". The claim is payable in full, with a payable amount of 180000.00.",
+  "cited_chunk_ids": []
+}

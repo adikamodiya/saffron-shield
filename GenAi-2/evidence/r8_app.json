@@ -1,0 +1,15 @@
+{
+  "mode": "endpoint",
+  "app": "claims-agent-chat",
+  "endpoint": "claims-agent",
+  "model": "claims.genai.claims_agent",
+  "served_version": "10",
+  "resource_key": "serving-endpoint",
+  "resource_permission": "CAN_QUERY",
+  "url": "https://claims-agent-chat-7474649491412411.aws.databricksapps.com",
+  "source_code": "/Workspace/Users/custom001x@gmail.com/saffron-shield/GenAi-2/app",
+  "app_sp": "app-26xct9 claims-agent-chat",
+  "screenshot": "evidence/screenshots/r8_app.png",
+  "demo": "evidence/r8_demo.gif",
+  "note": "App forwards each chat question to the claims-agent serving endpoint (dataframe_records); the endpoint runs the R7 pyfunc agent (v10, v2 prompt, temp 0) with the 4 R1 UC tools. Resource attach + CAN_QUERY for the app SP was done via the Apps UI (API returned 'Invalid delegation claim present in Ctx'). App confirmed Running and answering in browser."
+}
